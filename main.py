@@ -1,8 +1,40 @@
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from datetime import datetime
 from os import walk
 from os.path import join, relpath
 from sys import argv
 from zipfile import ZipFile, ZIP_DEFLATED
+
+
+def epilog() -> str:
+    ...
+
+
+def create_cmd_line_args_parser() -> ArgumentParser:
+    parser = ArgumentParser(description="Rudimentary Backup Tool", epilog=epilog(), formatter_class=RawTextHelpFormatter)
+
+    # positional mandatory arguments
+    parser.add_argument(
+        "config_file",
+        help="the name of the configuration YAML file"
+    )
+
+    # optional arguments
+    parser.add_argument(
+        "-c", "--no-color",
+        dest="no_color",
+        default=False,
+        action="store_true",
+        help="if specified, the output will not use any colors"
+    )
+
+    return parser
+
+
+def parse_cmd_line_args() -> Namespace:
+    parser = create_cmd_line_args_parser()
+    params = parser.parse_args()
+    return params
 
 
 def current_timestamp() -> str:
