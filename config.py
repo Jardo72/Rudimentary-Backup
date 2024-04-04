@@ -18,17 +18,30 @@ class Configuration:
     targets: tuple[Target, ...]
 
 
+class InvalidConfigurationError(Exception):
+
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
 def _read_single_target(yaml_data: dict[str, str]) -> Target:
+    DESCRIPTION = "description"
+    SOURCE_PATH = "source-path"
+    DESTINATION_PATH = "destination-path"
+    INCLUDE_PATTERNS = "include-patterns"
+    EXCLUDE_PATTERNS = "exclude-patterns"
+
     include_patterns = None
     exclude_patterns = None
-    if "include-patterns" in yaml_data:
-        include_patterns = yaml_data["include-patterns"]
-    if "exclude-patterns" in yaml_data:
-        exclude_patterns = yaml_data["exclude-patterns"]
+    if INCLUDE_PATTERNS in yaml_data:
+        include_patterns = yaml_data[INCLUDE_PATTERNS]
+    if EXCLUDE_PATTERNS in yaml_data:
+        exclude_patterns = yaml_data[EXCLUDE_PATTERNS]
+
     return Target(
-        description=yaml_data["description"],
-        source_path=yaml_data["source-path"],
-        destination_path=yaml_data["destination-path"],
+        description=yaml_data[DESCRIPTION],
+        source_path=yaml_data[SOURCE_PATH],
+        destination_path=yaml_data[DESTINATION_PATH],
         include_patterns=include_patterns,
         exclude_patterns=exclude_patterns
     )
@@ -42,15 +55,18 @@ def _read_targets(yaml_data: list[dict[str, str]]) -> tuple[Target, ...]:
 
 
 def read_configuration(filename: str) -> Configuration:
+    TEMP_DIR = "temp-dir"
+    TARGETS = "targets"
+
     with open(filename, "r") as config_file:
         yaml_data = safe_load(config_file)
-        if "temp-dir" not in yaml_data:
-            # TODO: raise an exception
-            ...
+        if TEMP_DIR not in yaml_data:
+            message = f"'{TEMP_DIR}' element missing in the configuration file '{filename}'."
+            raise InvalidConfigurationError(message)
         if "targets" not in yaml_data:
-            # TODO: raise an exception
-            ...
+            message = f"'{TARGETS}' element missing in the configuration file '{filename}'."
+            raise InvalidConfigurationError(message)
         return Configuration(
-            temp_dir=yaml_data["temp-dir"],
+            temp_dir=yaml_data[TEMP_DIR],
             targets=_read_targets(yaml_data["targets"])
         )

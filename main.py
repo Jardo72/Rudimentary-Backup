@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from datetime import datetime
 from os import walk
-from os.path import join, relpath
+from os.path import getsize, join, relpath
 from sys import argv
 from zipfile import ZipFile, ZIP_DEFLATED
 
@@ -58,6 +58,7 @@ def main() -> None:
                 pathname = join(dir, file)
                 entry = relpath(pathname, join(root, ".."))
                 archive.write(pathname, entry)
+                getsize(pathname)
                 # TODO: remove
                 # print()
                 # print(60 * "=")
