@@ -5,6 +5,8 @@ from os.path import join, relpath
 from sys import argv
 from zipfile import ZipFile, ZIP_DEFLATED
 
+from config import read_configuration
+
 
 def epilog() -> str:
     ...
@@ -42,6 +44,11 @@ def current_timestamp() -> str:
 
 
 def main() -> None:
+    cmd_line_args = parse_cmd_line_args()
+    configuration = read_configuration(cmd_line_args.config_file)
+    print(configuration)
+    return
+
     root = argv[1]
     print(current_timestamp())
     archive_name = f"test-{current_timestamp()}.zip"
@@ -51,6 +58,7 @@ def main() -> None:
                 pathname = join(dir, file)
                 entry = relpath(pathname, join(root, ".."))
                 archive.write(pathname, entry)
+                # TODO: remove
                 # print()
                 # print(60 * "=")
                 # print(f"Path = {pathname}")
