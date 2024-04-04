@@ -19,12 +19,18 @@ class Configuration:
 
 
 def _read_single_target(yaml_data: dict[str, str]) -> Target:
+    include_patterns = None
+    exclude_patterns = None
+    if "include-patterns" in yaml_data:
+        include_patterns = yaml_data["include-patterns"]
+    if "exclude-patterns" in yaml_data:
+        exclude_patterns = yaml_data["exclude-patterns"]
     return Target(
         description=yaml_data["description"],
         source_path=yaml_data["source-path"],
         destination_path=yaml_data["destination-path"],
-        include_patterns=None,
-        exclude_patterns=None
+        include_patterns=include_patterns,
+        exclude_patterns=exclude_patterns
     )
 
 
