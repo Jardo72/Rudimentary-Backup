@@ -1,10 +1,7 @@
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from datetime import datetime
-from os import walk
-from os.path import getsize, join, relpath
-from sys import argv
-from zipfile import ZipFile, ZIP_DEFLATED
 
+from archiver import Archiver
 from config import read_configuration
 
 
@@ -47,23 +44,22 @@ def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     configuration = read_configuration(cmd_line_args.config_file)
     print(configuration)
+    for target in configuration.targets:
+        archiver = Archiver(target, configuration.temp_dir)
+        archive_info = archiver.create_archive()
+        print(archive_info)
     return
 
-    root = argv[1]
-    print(current_timestamp())
-    archive_name = f"test-{current_timestamp()}.zip"
-    with ZipFile(archive_name, "w", ZIP_DEFLATED) as archive:
-        for dir, _, files in walk(root, topdown=True):
-            for file in files:
-                pathname = join(dir, file)
-                entry = relpath(pathname, join(root, ".."))
-                archive.write(pathname, entry)
-                getsize(pathname)
-                # TODO: remove
-                # print()
-                # print(60 * "=")
-                # print(f"Path = {pathname}")
-                # print(f"Entry = {entry}")
+    # TODO: remove
+    # root = argv[1]
+    # print(current_timestamp())
+    # archive_name = f"test-{current_timestamp()}.zip"
+    # with ZipFile(archive_name, "w", ZIP_DEFLATED) as archive:
+    #     for dir, _, files in walk(root, topdown=True):
+    #         for file in files:
+    #             pathname = join(dir, file)
+    #             entry = relpath(pathname, join(root, ".."))
+    #             archive.write(pathname, entry)
 
 
 if __name__ == "__main__":
