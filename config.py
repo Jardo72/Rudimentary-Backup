@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from os.path import isdir
+from pathlib import Path
 
 from yaml import safe_load
 
@@ -30,6 +32,22 @@ def _read_single_target(yaml_data: dict[str, str]) -> Target:
     DESTINATION_PATH = "destination-path"
     INCLUDE_PATTERNS = "include-patterns"
     EXCLUDE_PATTERNS = "exclude-patterns"
+
+    if SOURCE_PATH not in yaml_data:
+        # TODO: raise an exception
+        ...
+    source_path = yaml_data[SOURCE_PATH]
+    if not isdir(source_path):
+        message = f"Source path '{source_path}' is not a directory."
+        raise InvalidConfigurationError(message)
+    
+    if DESTINATION_PATH not in yaml_data:
+        # TODO: raise an exception
+        ...
+    destination_path = yaml_data[DESTINATION_PATH]
+    if isdir(destination_path):
+        message = f"Destination path '{destination_path}' is not a directory."
+        raise InvalidConfigurationError(message)
 
     include_patterns = None
     exclude_patterns = None

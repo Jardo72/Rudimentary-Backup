@@ -50,17 +50,6 @@ def main() -> None:
         print(archive_info)
     return
 
-    # TODO: remove
-    # root = argv[1]
-    # print(current_timestamp())
-    # archive_name = f"test-{current_timestamp()}.zip"
-    # with ZipFile(archive_name, "w", ZIP_DEFLATED) as archive:
-    #     for dir, _, files in walk(root, topdown=True):
-    #         for file in files:
-    #             pathname = join(dir, file)
-    #             entry = relpath(pathname, join(root, ".."))
-    #             archive.write(pathname, entry)
-
 
 if __name__ == "__main__":
     main()
