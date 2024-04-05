@@ -21,8 +21,9 @@ class ArchiveStatus(Enum):
 @dataclass(frozen=True)
 class ArchiveInfo:
     target: Target
-    file_count: int
-    byte_count: int
+    archived_file_count: int
+    archived_byte_count: int
+    ignored_file_count: int
     archive_size: int
     status: ArchiveStatus
 
@@ -36,20 +37,25 @@ class Archiver:
     def create_archive(self) -> ArchiveInfo:
         _, source_dir = split(self._target.source_path)
         archive_name = join(self._temp_dir, f"{source_dir}-{_current_timestamp()}.zip")
-        file_count = 0
-        byte_count = 0
+        archived_file_count = 0
+        archived_byte_count = 0
+        ignored_file_count = 0
         with ZipFile(archive_name, "w", ZIP_DEFLATED) as archive:
             for dir, _, files in walk(self._target.source_path, topdown=True):
                 for file in files:
                     pathname = join(dir, file)
-                    entry = relpath(pathname, join(self._target.source_path, ".."))
-                    archive.write(pathname, entry)
-                    byte_count += getsize(pathname)
-                    file_count += 1
+                    if self._target.is_relevant(pathname):
+                        entry = relpath(pathname, join(self._target.source_path, ".."))
+                        archive.write(pathname, entry)
+                        archived_byte_count += getsize(pathname)
+                        archived_file_count += 1
+                    else:
+                        ignored_file_count += 1
             return ArchiveInfo(
                 target=self._target,
-                file_count=file_count,
-                byte_count=byte_count,
+                archived_file_count=archived_file_count,
+                archived_byte_count=archived_byte_count,
+                ignored_file_count=ignored_file_count,
                 archive_size=getsize(archive_name),
                 status=ArchiveStatus.OK,
             )

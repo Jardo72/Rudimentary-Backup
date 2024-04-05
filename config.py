@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from os.path import isdir
+from re import match
 
 from yaml import safe_load
 
@@ -11,6 +12,41 @@ class Target:
     destination_path: str
     include_patterns: tuple[str, ...] | None
     exclude_patterns: tuple[str, ...] | None
+
+    def _has_include_patterns(self) -> bool:
+        if self.include_patterns is None:
+            return False
+        return len(self.include_patterns) > 0
+
+    def _is_included(self, filename: str) -> bool:
+        for pattern in self.include_patterns:
+            if match(pattern, filename):
+                return True
+        return False
+
+    def _has_exclude_patterns(self) -> bool:
+        if self.exclude_patterns is None:
+            return False
+        return len(self.exclude_patterns) > 0
+
+    def _is_excluded(self, filename: str) -> bool:
+        for pattern in self.exclude_patterns:
+            if match(pattern, filename):
+                return True
+        return False
+
+    def is_relevant(self, filename: str) -> bool:
+        if self.include_patterns is None and self.exclude_patterns is None:
+            return True
+
+        if self._has_include_patterns():
+            return self._is_included(filename)
+        
+        if self._has_exclude_patterns():
+            return not self._is_excluded(filename)
+
+        # TODO:
+        # raise an exception - this should never be reached
 
 
 @dataclass(frozen=True)
