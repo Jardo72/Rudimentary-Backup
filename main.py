@@ -1,9 +1,9 @@
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
-from datetime import datetime
 
-from colorama import init as init_colorama
+from rich.console import Console
+from rich.table import Table
 
-from archiver import Archiver
+from archiver import Archiver, ArchiveInfo
 from config import read_configuration
 
 
@@ -20,15 +20,6 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         help="the name of the configuration YAML file"
     )
 
-    # optional arguments
-    parser.add_argument(
-        "-c", "--no-color",
-        dest="no_color",
-        default=False,
-        action="store_true",
-        help="if specified, the output will not use any colors"
-    )
-
     return parser
 
 
@@ -38,26 +29,39 @@ def parse_cmd_line_args() -> Namespace:
     return params
 
 
-def current_timestamp() -> str:
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+def print_summary(archive_info_list: list[ArchiveInfo]) -> None:
+    table = Table(title="Summary")
+
+    table.add_column("Target", justify="left")
+    table.add_column("Archived Files", justify="right")
+    table.add_column("Archived Bytes", justify="right")
+    table.add_column("Ignored Files", justify="right")
+    table.add_column("Archive Size", justify="right")
+    table.add_column("Status", justify="center")
+    
+    for archive_info in archive_info_list:
+        table.add_row(
+            archive_info.target.description,
+            str(archive_info.archived_file_count),
+            str(archive_info.archived_byte_count),
+            str(archive_info.ignored_file_count),
+            str(archive_info.archive_size),
+            archive_info.status.name
+        )
+
+    console = Console()
+    console.print(table)
 
 
 def main() -> None:
-    init_colorama()
     cmd_line_args = parse_cmd_line_args()
     configuration = read_configuration(cmd_line_args.config_file)
-    start_time = current_timestamp()
     archive_info_list = []
     for target in configuration.targets:
         archiver = Archiver(target, configuration.temp_dir)
         archive_info = archiver.create_archive()
-        print(archive_info)
         archive_info_list.append(archive_info)
-    end_time = current_timestamp()
-
-    print()
-    print(f"Start time: {start_time}")
-    print(f"End time:   {end_time}")
+    print_summary(archive_info_list)
 
 
 if __name__ == "__main__":
