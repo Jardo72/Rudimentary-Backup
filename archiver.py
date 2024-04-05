@@ -3,6 +3,7 @@ from datetime import datetime
 from enum import Enum, unique
 from os import walk
 from os.path import getsize, join, relpath, split
+from shutil import move
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from config import Target
@@ -51,11 +52,13 @@ class Archiver:
                         archived_file_count += 1
                     else:
                         ignored_file_count += 1
-            return ArchiveInfo(
-                target=self._target,
-                archived_file_count=archived_file_count,
-                archived_byte_count=archived_byte_count,
-                ignored_file_count=ignored_file_count,
-                archive_size=getsize(archive_name),
-                status=ArchiveStatus.OK,
-            )
+        archive_size = getsize(archive_name)
+        move(archive_name, self._target.destination_path)
+        return ArchiveInfo(
+            target=self._target,
+            archived_file_count=archived_file_count,
+            archived_byte_count=archived_byte_count,
+            ignored_file_count=ignored_file_count,
+            archive_size=archive_size,
+            status=ArchiveStatus.OK,
+        )

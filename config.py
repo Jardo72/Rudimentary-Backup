@@ -80,7 +80,7 @@ def _read_single_target(yaml_data: dict[str, str]) -> Target:
         message = f"Missing '{DESTINATION_PATH}' element in one of the targets."
         raise InvalidConfigurationError(message)
     destination_path = yaml_data[DESTINATION_PATH]
-    if isdir(destination_path):
+    if not isdir(destination_path):
         message = f"Destination path '{destination_path}' is not a directory."
         raise InvalidConfigurationError(message)
 
