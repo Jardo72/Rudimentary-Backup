@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum, auto, unique
+from enum import Enum, unique
 from os import walk
 from os.path import getsize, join, relpath, split
 from zipfile import ZipFile, ZIP_DEFLATED
@@ -14,8 +14,8 @@ def _current_timestamp() -> str:
 
 @unique
 class ArchiveStatus(Enum):
-    OK = auto()
-    FAILED = auto()
+    OK = "OK"
+    FAILED = "FAILED"
 
 
 @dataclass(frozen=True)

@@ -1,6 +1,8 @@
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from datetime import datetime
 
+from colorama import init as init_colorama
+
 from archiver import Archiver
 from config import read_configuration
 
@@ -37,18 +39,25 @@ def parse_cmd_line_args() -> Namespace:
 
 
 def current_timestamp() -> str:
-    return datetime.now().strftime("%Y%m%d-%H%M%S")
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def main() -> None:
+    init_colorama()
     cmd_line_args = parse_cmd_line_args()
     configuration = read_configuration(cmd_line_args.config_file)
-    print(configuration)
+    start_time = current_timestamp()
+    archive_info_list = []
     for target in configuration.targets:
         archiver = Archiver(target, configuration.temp_dir)
         archive_info = archiver.create_archive()
         print(archive_info)
-    return
+        archive_info_list.append(archive_info)
+    end_time = current_timestamp()
+
+    print()
+    print(f"Start time: {start_time}")
+    print(f"End time:   {end_time}")
 
 
 if __name__ == "__main__":
