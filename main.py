@@ -29,7 +29,7 @@ def parse_cmd_line_args() -> Namespace:
     return params
 
 
-def print_summary(archive_info_list: list[ArchiveInfo]) -> None:
+def print_summary(archive_info_list: list[ArchiveInfo], console: Console) -> None:
     table = Table(title="Summary")
 
     table.add_column("Target", justify="left")
@@ -49,7 +49,6 @@ def print_summary(archive_info_list: list[ArchiveInfo]) -> None:
             archive_info.status.name
         )
 
-    console = Console()
     console.print(table)
 
 
@@ -57,11 +56,15 @@ def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     configuration = read_configuration(cmd_line_args.config_file)
     archive_info_list = []
-    for target in configuration.targets:
-        archiver = Archiver(target, configuration.temp_dir)
-        archive_info = archiver.create_archive()
-        archive_info_list.append(archive_info)
-    print_summary(archive_info_list)
+    console = Console()
+    with console.status("[bold blue]Archiving target...") as status:
+        for target in configuration.targets:
+            archiver = Archiver(target, configuration.temp_dir)
+            archive_info = archiver.create_archive()
+            archive_info_list.append(archive_info)
+            console.log(f"[green]Target [bold italic]{target.description}[/bold italic] archived[/green]")
+        console.log("[bold green]All targets archived.")
+    print_summary(archive_info_list, console)
 
 
 if __name__ == "__main__":
