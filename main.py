@@ -1,5 +1,4 @@
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
-from datetime import datetime
 
 from rich.console import Console
 from rich.table import Table
@@ -30,10 +29,6 @@ def parse_cmd_line_args() -> Namespace:
     return params
 
 
-def current_timestamp() -> str:
-    return datetime.now().strftime("%H:%M:%S")
-
-
 def print_summary(archive_info_list: list[ArchiveInfo], console: Console) -> None:
     table = Table(title="Summary", show_lines=True)
 
@@ -62,13 +57,13 @@ def main() -> None:
     configuration = read_configuration(cmd_line_args.config_file)
     archive_info_list = []
     console = Console()
-    with console.status("[bold blue]Archiving target...") as status:
+    with console.status("[bold][blue]Archiving target...[/blue][bold]"):
         for target in configuration.targets:
             archiver = Archiver(target, configuration.temp_dir)
             archive_info = archiver.create_archive()
             archive_info_list.append(archive_info)
-            console.print(f"[green]{current_timestamp()}: Target [bold italic]{target.description}[/bold italic] archived[/green]")
-        console.print("[bold green]All targets archived.")
+            console.print(f"Target [green][bold]{target.description}[/green][/bold] archived")
+        console.print("[bold][green]All targets archived.[/bold][/green]")
     print_summary(archive_info_list, console)
 
 
