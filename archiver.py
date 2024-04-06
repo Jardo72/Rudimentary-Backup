@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime
 from enum import Enum, unique
 from os import walk
 from os.path import getsize, join, relpath, split
@@ -7,10 +6,6 @@ from shutil import move
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from config import Target
-
-
-def _current_timestamp() -> str:
-    return datetime.now().strftime("%Y%m%d-%H%M%S")
 
 
 @unique
@@ -31,13 +26,13 @@ class ArchiveInfo:
 
 class Archiver:
 
-    def __init__(self, target: Target, temp_dir: str) -> None:
+    def __init__(self, target: Target, temp_dir: str, destination_dir: str) -> None:
         self._target = target
         self._temp_dir = temp_dir
+        self._destination_dir = destination_dir
 
     def create_archive(self) -> ArchiveInfo:
-        _, source_dir = split(self._target.source_path)
-        archive_name = join(self._temp_dir, f"{source_dir}-{_current_timestamp()}.zip")
+        archive_name = join(self._temp_dir, f"{self._target.archive_name}.zip")
         archived_file_count = 0
         archived_byte_count = 0
         ignored_file_count = 0
@@ -53,7 +48,7 @@ class Archiver:
                     else:
                         ignored_file_count += 1
         archive_size = getsize(archive_name)
-        move(archive_name, self._target.destination_path)
+        move(archive_name, self._destination_dir)
         return ArchiveInfo(
             target=self._target,
             archived_file_count=archived_file_count,

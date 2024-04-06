@@ -9,7 +9,7 @@ from yaml import safe_load
 class Target:
     description: str
     source_path: str
-    destination_path: str
+    archive_name: str
     include_patterns: tuple[str, ...] | None
     exclude_patterns: tuple[str, ...] | None
 
@@ -45,13 +45,14 @@ class Target:
         if self._has_exclude_patterns():
             return not self._is_excluded(filename)
 
-        # TODO:
-        # raise an exception - this should never be reached
+        message = "Single target cannot have both include and exclude patterns."
+        raise InvalidConfigurationError(message)
 
 
 @dataclass(frozen=True)
 class Configuration:
     temp_dir: str
+    destination_dir: str
     targets: tuple[Target, ...]
 
 
@@ -64,7 +65,7 @@ class InvalidConfigurationError(Exception):
 def _read_single_target(yaml_data: dict[str, str]) -> Target:
     DESCRIPTION = "description"
     SOURCE_PATH = "source-path"
-    DESTINATION_PATH = "destination-path"
+    ARCHIVE_NAME = "archive-name"
     INCLUDE_PATTERNS = "include-patterns"
     EXCLUDE_PATTERNS = "exclude-patterns"
 
@@ -76,12 +77,8 @@ def _read_single_target(yaml_data: dict[str, str]) -> Target:
         message = f"Source path '{source_path}' is not a directory."
         raise InvalidConfigurationError(message)
     
-    if DESTINATION_PATH not in yaml_data:
-        message = f"Missing '{DESTINATION_PATH}' element in one of the targets."
-        raise InvalidConfigurationError(message)
-    destination_path = yaml_data[DESTINATION_PATH]
-    if not isdir(destination_path):
-        message = f"Destination path '{destination_path}' is not a directory."
+    if ARCHIVE_NAME not in yaml_data:
+        message = f"Missing '{ARCHIVE_NAME}' element in one of the targets."
         raise InvalidConfigurationError(message)
 
     include_patterns = None
@@ -94,7 +91,7 @@ def _read_single_target(yaml_data: dict[str, str]) -> Target:
     return Target(
         description=yaml_data[DESCRIPTION],
         source_path=yaml_data[SOURCE_PATH],
-        destination_path=yaml_data[DESTINATION_PATH],
+        archive_name=yaml_data[ARCHIVE_NAME],
         include_patterns=include_patterns,
         exclude_patterns=exclude_patterns
     )
@@ -109,6 +106,7 @@ def _read_targets(yaml_data: list[dict[str, str]]) -> tuple[Target, ...]:
 
 def read_configuration(filename: str) -> Configuration:
     TEMP_DIR = "temp-dir"
+    DESTINATION_DIR = "destination-dir"
     TARGETS = "targets"
 
     with open(filename, "r") as config_file:
@@ -116,10 +114,14 @@ def read_configuration(filename: str) -> Configuration:
         if TEMP_DIR not in yaml_data:
             message = f"'{TEMP_DIR}' element missing in the configuration file '{filename}'."
             raise InvalidConfigurationError(message)
+        if DESTINATION_DIR not in yaml_data:
+            message = f"'{DESTINATION_DIR}' element missing in the configuration file '{filename}'."
+            raise InvalidConfigurationError(message)
         if "targets" not in yaml_data:
             message = f"'{TARGETS}' element missing in the configuration file '{filename}'."
             raise InvalidConfigurationError(message)
         return Configuration(
             temp_dir=yaml_data[TEMP_DIR],
+            destination_dir=yaml_data[DESTINATION_DIR],
             targets=_read_targets(yaml_data["targets"])
         )

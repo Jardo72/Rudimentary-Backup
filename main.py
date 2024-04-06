@@ -1,4 +1,7 @@
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from datetime import datetime
+from os import makedirs
+from os.path import join
 
 from rich.console import Console
 from rich.table import Table
@@ -29,6 +32,10 @@ def parse_cmd_line_args() -> Namespace:
     return params
 
 
+def current_timestamp() -> str:
+    return datetime.now().strftime("%Y%m%d-%H%M%S")
+
+
 def print_summary(archive_info_list: list[ArchiveInfo], console: Console) -> None:
     table = Table(title="Summary", show_lines=True)
 
@@ -55,14 +62,18 @@ def print_summary(archive_info_list: list[ArchiveInfo], console: Console) -> Non
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     configuration = read_configuration(cmd_line_args.config_file)
+    target_count = len(configuration.targets)
     archive_info_list = []
     console = Console()
+    console.print()
+    destination_dir = join(configuration.destination_dir, current_timestamp())
+    makedirs(destination_dir, exist_ok=True)
     with console.status("[bold][blue]Archiving target...[/blue][bold]"):
-        for target in configuration.targets:
-            archiver = Archiver(target, configuration.temp_dir)
+        for index, target in enumerate(configuration.targets):
+            archiver = Archiver(target, configuration.temp_dir, destination_dir)
             archive_info = archiver.create_archive()
             archive_info_list.append(archive_info)
-            console.print(f"Target [green][bold]{target.description}[/green][/bold] archived")
+            console.print(f"Target [green][bold]{target.description}[/green][/bold] ({index + 1}/{target_count}) archived")
         console.print("[bold][green]All targets archived.[/bold][/green]")
     print_summary(archive_info_list, console)
 
