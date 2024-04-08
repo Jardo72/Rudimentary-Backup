@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.table import Table
 
 from archiver import Archiver, ArchiveInfo
-from config import read_configuration
+from config import read_configuration, Configuration
 
 
 def epilog() -> str:
@@ -21,6 +21,14 @@ def create_cmd_line_args_parser() -> ArgumentParser:
     parser.add_argument(
         "config_file",
         help="the name of the configuration YAML file"
+    )
+
+    # optional arguments
+    parser.add_argument(
+        "-o", "--output-html",
+        dest="output_html_file",
+        default=None,
+        help="the optional name of an HTML output file the report is to be written to"
     )
 
     return parser
@@ -59,13 +67,9 @@ def print_summary(archive_info_list: list[ArchiveInfo], console: Console) -> Non
     console.print(table)
 
 
-def main() -> None:
-    cmd_line_args = parse_cmd_line_args()
-    configuration = read_configuration(cmd_line_args.config_file)
+def create_backup(configuration: Configuration, console: Console) -> None:
     target_count = len(configuration.targets)
     archive_info_list = []
-    console = Console()
-    console.print()
     destination_dir = join(configuration.destination_dir, current_timestamp())
     makedirs(destination_dir, exist_ok=True)
     with console.status("[bold][blue]Archiving target...[/blue][bold]"):
@@ -76,6 +80,19 @@ def main() -> None:
             console.print(f"Target [green][bold]{target.description}[/green][/bold] ({index + 1}/{target_count}) archived")
         console.print("[bold][green]All targets archived.[/bold][/green]")
     print_summary(archive_info_list, console)
+
+
+def main() -> None:
+    cmd_line_args = parse_cmd_line_args()
+    console = Console(record=True)
+    console.print()
+    try:
+        configuration = read_configuration(cmd_line_args.config_file)
+        create_backup(configuration, console)
+    except Exception as e:
+        console.print_exception()
+    if cmd_line_args.output_html_file:
+        console.save_html(cmd_line_args.output_html_file)
 
 
 if __name__ == "__main__":
