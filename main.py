@@ -90,7 +90,7 @@ def main() -> None:
         configuration = read_configuration(cmd_line_args.config_file)
         create_backup(configuration, console)
     except Exception as e:
-        console.print_exception()
+        console.print_exception(show_locals=False)
     if cmd_line_args.output_html_file:
         console.save_html(cmd_line_args.output_html_file)
 
