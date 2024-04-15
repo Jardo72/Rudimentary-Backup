@@ -42,5 +42,9 @@ targets:
 ## How to Run the Application
 
 ```
-python ...
+python -m backup --help
+```
+
+```
+python -m backup config.yml
 ```

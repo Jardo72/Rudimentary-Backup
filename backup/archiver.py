@@ -5,7 +5,7 @@ from os.path import getsize, join, relpath
 from shutil import move
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from config import Target
+from .config import Target
 
 
 @unique

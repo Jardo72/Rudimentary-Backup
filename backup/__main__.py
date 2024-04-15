@@ -6,8 +6,8 @@ from os.path import join
 from rich.console import Console
 from rich.table import Table
 
-from archiver import Archiver, ArchiveInfo, ArchiveStatus
-from config import read_configuration, Configuration
+from .archiver import Archiver, ArchiveInfo, ArchiveStatus
+from .config import read_configuration, Configuration
 
 
 def epilog() -> str:
