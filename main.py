@@ -6,7 +6,7 @@ from os.path import join
 from rich.console import Console
 from rich.table import Table
 
-from archiver import Archiver, ArchiveInfo
+from archiver import Archiver, ArchiveInfo, ArchiveStatus
 from config import read_configuration, Configuration
 
 
@@ -88,14 +88,24 @@ def print_summary(archive_info_list: list[ArchiveInfo], console: Console) -> Non
     table.add_column("Status", justify="center")
     
     for archive_info in archive_info_list:
-        table.add_row(
-            archive_info.target.description,
-            str(archive_info.archived_file_count),
-            str(archive_info.archived_byte_count),
-            str(archive_info.ignored_file_count),
-            str(archive_info.archive_size),
-            archive_info.status.name
-        )
+        if archive_info.status == ArchiveStatus.OK:
+            table.add_row(
+                archive_info.target.description,
+                str(archive_info.archived_file_count),
+                str(archive_info.archived_byte_count),
+                str(archive_info.ignored_file_count),
+                str(archive_info.archive_size),
+                archive_info.status.name
+            )
+        else:
+            table.add_row(
+                archive_info.target.description,
+                "N/A",
+                "N/A",
+                "N/A",
+                "N/A",
+                archive_info.status.name
+            )
 
     console.print(table)
 
