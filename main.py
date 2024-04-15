@@ -77,6 +77,21 @@ def current_timestamp() -> str:
     return datetime.now().strftime("%Y%m%d-%H%M%S")
 
 
+def create_backup(configuration: Configuration, console: Console) -> list[ArchiveInfo]:
+    target_count = len(configuration.targets)
+    archive_info_list = []
+    destination_dir = join(configuration.destination_dir, current_timestamp())
+    makedirs(destination_dir, exist_ok=True)
+    with console.status("[bold][blue]Archiving target...[/blue][bold]"):
+        for index, target in enumerate(configuration.targets):
+            archiver = Archiver(target, configuration.temp_dir, destination_dir)
+            archive_info = archiver.create_archive()
+            archive_info_list.append(archive_info)
+            console.print(f"Target [green][bold]{target.description}[/green][/bold] ({index + 1}/{target_count}) archived")
+        console.print("[bold][green]All targets archived.[/bold][/green]")
+    return archive_info_list
+
+
 def print_summary(archive_info_list: list[ArchiveInfo], console: Console) -> None:
     table = Table(title="Summary", show_lines=True)
 
@@ -101,32 +116,37 @@ def print_summary(archive_info_list: list[ArchiveInfo], console: Console) -> Non
     console.print(table)
 
 
-def create_backup(configuration: Configuration, console: Console) -> None:
-    target_count = len(configuration.targets)
-    archive_info_list = []
-    destination_dir = join(configuration.destination_dir, current_timestamp())
-    makedirs(destination_dir, exist_ok=True)
-    with console.status("[bold][blue]Archiving target...[/blue][bold]"):
-        for index, target in enumerate(configuration.targets):
-            archiver = Archiver(target, configuration.temp_dir, destination_dir)
-            archive_info = archiver.create_archive()
-            archive_info_list.append(archive_info)
-            console.print(f"Target [green][bold]{target.description}[/green][/bold] ({index + 1}/{target_count}) archived")
-        console.print("[bold][green]All targets archived.[/bold][/green]")
-    print_summary(archive_info_list, console)
+def print_errors(archive_info_list: list[ArchiveInfo], console: Console) -> None:
+    error_list = list(filter(lambda i: i.status == ArchiveStatus.FAILED, archive_info_list))
+    if error_list is None or len(error_list) == 0:
+        return
+
+    table = Table(title="Errors", show_lines=True)
+
+    table.add_column("Target", justify="left")
+    table.add_column("Error", justify="right")
+
+    for archive_info in error_list:
+        table.add_row(
+            archive_info.target.description,
+            str(archive_info.error)
+        )
 
 
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
-    console = Console(record=True)
+    console = Console(record=False)
     console.print()
     try:
         configuration = read_configuration(cmd_line_args.config_file)
-        create_backup(configuration, console)
-    except Exception as e:
+        archive_info_list = create_backup(configuration, console)
+        console = Console(record=True)
+        print_summary(archive_info_list, console)
+        print_errors(archive_info_list, console)
+        if cmd_line_args.output_html_file:
+            console.save_html(cmd_line_args.output_html_file)
+    except Exception:
         console.print_exception(show_locals=False)
-    if cmd_line_args.output_html_file:
-        console.save_html(cmd_line_args.output_html_file)
 
 
 if __name__ == "__main__":
