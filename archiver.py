@@ -5,8 +5,6 @@ from os.path import getsize, join, relpath
 from shutil import move
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from rich.console import Console
-
 from config import Target
 
 
@@ -29,11 +27,10 @@ class ArchiveInfo:
 
 class Archiver:
 
-    def __init__(self, target: Target, temp_dir: str, destination_dir: str, console: Console) -> None:
+    def __init__(self, target: Target, temp_dir: str, destination_dir: str) -> None:
         self._target = target
         self._temp_dir = temp_dir
         self._destination_dir = destination_dir
-        self._console = console
 
     def create_archive(self) -> ArchiveInfo:
         try:
