@@ -91,19 +91,10 @@ def print_summary(archive_info_list: list[ArchiveInfo], console: Console) -> Non
         if archive_info.status == ArchiveStatus.OK:
             table.add_row(
                 archive_info.target.description,
-                str(archive_info.archived_file_count),
-                str(archive_info.archived_byte_count),
-                str(archive_info.ignored_file_count),
-                str(archive_info.archive_size),
-                archive_info.status.name
-            )
-        else:
-            table.add_row(
-                archive_info.target.description,
-                "N/A",
-                "N/A",
-                "N/A",
-                "N/A",
+                str(archive_info.archived_file_count) if archive_info.archived_file_count else "",
+                str(archive_info.archived_byte_count) if archive_info.archived_byte_count else "",
+                str(archive_info.ignored_file_count) if archive_info.ignored_file_count else "",
+                str(archive_info.archive_size) if archive_info.archive_size else "",
                 archive_info.status.name
             )
 
