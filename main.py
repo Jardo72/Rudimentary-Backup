@@ -107,7 +107,7 @@ def create_backup(configuration: Configuration, console: Console) -> None:
     makedirs(destination_dir, exist_ok=True)
     with console.status("[bold][blue]Archiving target...[/blue][bold]"):
         for index, target in enumerate(configuration.targets):
-            archiver = Archiver(target, configuration.temp_dir, destination_dir)
+            archiver = Archiver(target, configuration.temp_dir, destination_dir, console)
             archive_info = archiver.create_archive()
             archive_info_list.append(archive_info)
             console.print(f"Target [green][bold]{target.description}[/green][/bold] ({index + 1}/{target_count}) archived")
