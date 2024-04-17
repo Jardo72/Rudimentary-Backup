@@ -23,9 +23,6 @@ targets:
   - description: CV + related documents
     source-path: C:\Home\CV
     archive-name: CV
-  - description: Financial Excel + related documents
-    source-path: C:\Home\Financial
-    archive-name: Financial-Documents
   - description: Keepass database
     source-path: C:\Home
     archive-name: Keepass
@@ -38,6 +35,11 @@ targets:
       - .+\.zip$
       - .+\.mp3$
 ```
+
+The example above defines three targets:
+* The first target will archive all files contained in the <code>C:\Home\CV</code> directory including subdirectories (the entire tree is archived recursively).
+* The second target will archive all files containing in the <code>C:\Home</code> directory that match the specified include pattern. As for the first target, the entire tree is evaluated. However, only files matching the specified include pattern are archived in this case.
+* The third target will archive all files containing in the <code>C:\Home\Knowledge-Base</code> directory that do not match the specified exclude pattern(s). As for the first target, the entire tree is evaluated. However, only files NOT matching any of the specified exclude patterns are archived in this case.
 
 ## How to Run the Application
 

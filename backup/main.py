@@ -20,9 +20,6 @@ targets:
   - description: CV + related documents
     source-path: C:\Home\CV
     archive-name: CV
-  - description: Financial Excel + related documents
-    source-path: C:\Home\Financial
-    archive-name: Financial-Documents
   - description: Keepass database
     source-path: C:\Home
     archive-name: Keepass
