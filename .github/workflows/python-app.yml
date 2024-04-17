@@ -1,0 +1,45 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Rudimentary Backup - Build
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  python-zip-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    - name: PYZ Build
+      run: |
+        mkdir application-build
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt --target ./application-build
+        cp --recursive ./backup ./application-build
+        python -m zipapp application-build --output=rbackup.pyz --main=backup.main:main
+        echo ''
+        echo 'Look at the outcome of the build'
+        ls -la
+
+    - name: Upload PYZ File
+      uses: actions/upload-artifact@v4
+      with:
+        name: rbackup
+        path: ./rbackup.pyz
+        retention-days: 90
+        if-no-files-found: error
