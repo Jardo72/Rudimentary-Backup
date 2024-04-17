@@ -32,4 +32,6 @@ jobs:
         pip install -r requirements.txt --target ./application-build
         cp --recursive ./backup ./application-build
         python -m zipapp application-build --output=rbackup.pyz --main=backup.main:main
+        echo 'Look at the outcome of the build'
+        ls -la
 
