@@ -42,3 +42,4 @@ jobs:
         name: rbackup.pyz
         path: ./rbackup.pyz
         retention-days: 90
+        if-no-files-found: error
