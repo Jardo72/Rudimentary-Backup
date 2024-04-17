@@ -42,11 +42,17 @@ The example above defines three targets:
 * The third target will archive all files containing in the <code>C:\Home\Knowledge-Base</code> directory that do not match the specified exclude pattern(s). As for the first target, the entire tree is evaluated. However, only files NOT matching any of the specified exclude patterns are archived in this case.
 
 ## How to Run the Application
+If you start the application with the <code>-h</code> (or <code>--help</code>) switch, you will get the information about the usage (i.e. expected command line parameters). Example:
+```
+python -m backup.main --help
+```
 
+The following example illustrates how to start the application using a configuration file with the name <code>config.yml</code>:
 ```
-python -m backup --help
+python -m backup.main config.yml
 ```
 
+The example above assumes you do not use the Python ZIP file. If you use the Python ZIP file, you can use the following command:
 ```
-python -m backup config.yml
+python rbackup.pyz config.yml
 ```
