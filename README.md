@@ -38,7 +38,7 @@ targets:
 
 The example above defines three targets:
 * The first target will archive all files contained in the <code>C:\Home\CV</code> directory including subdirectories (the entire tree is archived recursively).
-* The second target will archive all files containing in the <code>C:\Home</code> directory that match the specified include pattern. As for the first target, the entire tree is evaluated. However, only files matching the specified include pattern are archived in this case.
+* The second target will archive all files containing in the <code>C:\Home</code> directory that match the specified include pattern. As for the first target, the entire tree is evaluated. However, only files matching the specified include pattern are archived in this case. In general, there can be two or more include patterns for a single target. In such case, each file matching any of the specified include patterns are archived.
 * The third target will archive all files containing in the <code>C:\Home\Knowledge-Base</code> directory that do not match the specified exclude pattern(s). As for the first target, the entire tree is evaluated. However, only files NOT matching any of the specified exclude patterns are archived in this case.
 
 ## How to Run the Application
