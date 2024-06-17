@@ -1,7 +1,7 @@
 # Rudimentary Backup
 
 ## Introduction
-Rudimentary Backup is a Python console application meant as a simple, minimalistic solution for backup of personal data.
+Rudimentary Backup is a Python console application meant as a simple, minimalistic solution for backup of personal data. It can archive the contents of one or more directories to the specified path. In concrete terms, for each of the specified directories, it creates a new archive file (ZIP). All archives created during a single run of the application are copied to a subdirectory of the specified path whose name is derived from the current date and time. The subdirectory is created automatically before copying of the created archives.
 
 ## Runtime Environment, Source Code Organization etc.
 When implementing the project, I used Python 3.10, so this version or any higher version should work properly. Chances are older versions will work as well, but I have not tried. The application depends on these 3rd party modules:
